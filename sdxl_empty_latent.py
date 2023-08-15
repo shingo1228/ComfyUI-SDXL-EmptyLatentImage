@@ -14,7 +14,8 @@ def extract_resolutions_with_key(file_path):
     for item in json_data:
         width = item["width"]
         height = item["height"]
-        key = f"{width} x {height}"
+        aspect_ratio = "{:.2f}".format(round(width / height, 2))
+        key = f"{width} x {height} ({aspect_ratio})"
         resolutions_dict[key] = {"width": width, "height": height}
 
     return resolutions_dict
