@@ -3,6 +3,7 @@ import json
 import os
 
 MAX_RESOLUTION=8192
+DEBUG = False
 
 def extract_resolutions_with_key(file_path):
     """指定したJSONファイルからwidthとheightのペアを取得し、
@@ -27,10 +28,11 @@ class SdxlEmptyLatentImage:
 
         current_dir = os.path.dirname(os.path.realpath(__file__))
         json_file_name = os.path.join(current_dir, "sdxl_resolution_set.json")
-
         self.resolutions  = extract_resolutions_with_key(json_file_name)
-        for key, item in self.resolutions.items():
-            print(f"key:{key} w:{item['width']} h:{item['height']}")
+
+        if DEBUG:
+            for key, item in self.resolutions.items():
+                print(f"key:{key} w:{item['width']} h:{item['height']}")
 
     @classmethod
     def INPUT_TYPES(s):
@@ -41,7 +43,9 @@ class SdxlEmptyLatentImage:
         res_list = []
         for key in resolutions:
             res_list.append(key)
-        print(res_list)
+        
+        if DEBUG:
+            print(res_list)
 
         return {"required": { "resolution": (res_list,),
                               "batch_size": ("INT", {"default": 1, "min": 1, "max": 64})
@@ -53,8 +57,9 @@ class SdxlEmptyLatentImage:
     CATEGORY = "latent"
 
     def generate(self, resolution, batch_size=1):
-        print(f"res_key:{resolution}")
-        print(f"item:{self.resolutions[resolution]}")
+        if DEBUG:
+            print(f"res_key:{resolution}")
+            print(f"item:{self.resolutions[resolution]}")
 
         latent = torch.zeros([batch_size, 4, self.resolutions[resolution]['height'] // 8, self.resolutions[resolution]['width'] // 8])
         return ({"samples":latent}, )
