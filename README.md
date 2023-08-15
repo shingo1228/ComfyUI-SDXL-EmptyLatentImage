@@ -1,0 +1,1 @@
+# ComfyUI-SDXL-EmptyLatentImage
