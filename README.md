@@ -1,7 +1,7 @@
 # ComfyUI-SDXL-EmptyLatentImage
 [Japanese README](README.jp.md)
 
-An extension node for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that allows you to select a resolution from the pre-defined json files and output a Latent Image.
+An extension node for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that allows you to select a resolution from the pre-defined json files and output a Latent Image.<br>
 ![](misc/ss_resolution_list.png)
 ## Features
 - You can retrieve a list of resolutions from a json file saved in the format below and select from the node's dropdown list.(The aspect ratio displayed in the dropdown is calculated as `width / height`.)
