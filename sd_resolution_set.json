@@ -4,11 +4,27 @@
         "height": 512
     },
     {
-        "width": 512,
-        "height": 768
+        "width": 688,
+        "height": 512
     },
     {
         "width": 768,
         "height": 512
+    },
+    {
+        "width": 912,
+        "height": 512
+    },
+    {
+        "width": 512,
+        "height": 688
+    },
+    {
+        "width": 512,
+        "height": 768
+    },
+    {
+        "width": 512,
+        "height": 912
     }
 ]
