@@ -4,7 +4,7 @@
 [![日本語](https://img.shields.io/badge/lang-日本語-red.svg)](README.jp.md)
 
 使用統計機能付きの解像度選択を提供する、シンプル化されたComfyUI拡張ノードです。<br>
-<img src="misc/ss_resolution_list.jpg" alt="ノード画像" style="width:50%; height:auto;">
+<img src="misc/ss_resolution_list.jpg" alt="ノード画像" style="width:300px; height:auto;">
 
 ## 機能
 

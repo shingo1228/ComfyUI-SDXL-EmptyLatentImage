@@ -4,7 +4,7 @@
 [![日本語](https://img.shields.io/badge/lang-日本語-red.svg)](README.jp.md)
 
 A simplified ComfyUI extension node that provides resolution selection with usage statistics for generating empty latent images.<br>
-<img src="misc/ss_resolution_list.jpg" alt="Node image" style="width:50%; height:auto;">
+<img src="misc/ss_resolution_list.jpg" alt="Node image" style="width:300px; height:auto;">
 
 ## Features
 
