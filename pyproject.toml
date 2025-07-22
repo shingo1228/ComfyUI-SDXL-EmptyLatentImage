@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-sdxl-emptylatentimage"
+description = "Nodes:SDXL Empty Latent Image. An extension node for ComfyUI that allows you to select a resolution from the pre-defined json files and output a Latent Image."
+version = "1.0.0"
+license = "LICENSE"
+
+[project.urls]
+Repository = "https://github.com/shingo1228/ComfyUI-SDXL-EmptyLatentImage"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-SDXL-EmptyLatentImage"
+Icon = ""
