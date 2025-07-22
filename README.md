@@ -12,6 +12,7 @@ A simplified ComfyUI extension node that provides resolution selection with usag
 - **Smart Resolution Selection**: Choose from pre-defined resolutions loaded from JSON files
 - **Category-based Organization**: Automatic categorization with priority order: Custom → SDXL → SD15
 - **Resolution Display**: Format `[Category] Width x Height (aspect_ratio)` with decimal aspect ratios
+- **Channel Selection**: Support for both 4-channel (SDXL/SD1.5) and 16-channel (SD3/Flux) latent generation
 
 ### Usage Statistics & Visual Feedback
 - **Usage Tracking**: Automatic recording of resolution usage frequency
@@ -62,6 +63,7 @@ Override default settings:
 - `SDXL_MAX_RESOLUTION`: Maximum allowed resolution (default: 8192)
 - `SDXL_MIN_RESOLUTION`: Minimum allowed resolution (default: 64)
 - `SDXL_MAX_BATCH_SIZE`: Maximum batch size (default: 64)
+- `SDXL_DEFAULT_CHANNELS`: Default channel count - 4 or 16 (default: 4)
 - `SDXL_TRACK_USAGE`: Enable/disable usage tracking (default: true)
 
 ### config.json (Optional)
@@ -71,6 +73,7 @@ Create or modify `config.json` for persistent settings:
   "max_resolution": 8192,
   "min_resolution": 64,
   "max_batch_size": 64,
+  "default_channels": 4,
   "track_usage": true
 }
 ```
@@ -130,12 +133,30 @@ echo '[{"width": 1024, "height": 1024}, {"width": 512, "height": 768}]' > custom
 4. (Optional) Customize settings in `config.json`
 5. Restart ComfyUI to load the extension
 
+## Channel Support
+
+This extension supports multiple latent channel configurations:
+
+### 4-Channel Mode (Default)
+- **Compatible with**: SDXL, SD1.5, and similar models
+- **Tensor shape**: `[batch_size, 4, height/8, width/8]`
+- **Use case**: Traditional Stable Diffusion workflows
+
+### 16-Channel Mode
+- **Compatible with**: SD3, Flux, and newer models
+- **Tensor shape**: `[batch_size, 16, height/8, width/8]`
+- **Use case**: Next-generation AI models requiring expanded latent space
+
+### Usage
+Simply select "4" or "16" from the channels dropdown in the node interface. The default can be configured via environment variables or config.json.
+
 ## Architecture
 
 This extension uses a simplified single-class design:
 - **Single File**: All functionality in `sdxl_empty_latent.py`
 - **Simple Caching**: Basic file modification time checking
 - **Minimal Configuration**: Environment variables + optional JSON config
-- **Essential Features Only**: Focus on core resolution selection and usage tracking
+- **Essential Features Only**: Focus on core resolution selection, usage tracking, and channel flexibility
+- **Multi-Model Support**: Compatible with SDXL, SD1.5, SD3, Flux, and future models
 
-The simplified architecture makes the code easy to understand, modify, and maintain while providing all essential features for resolution management in ComfyUI workflows.
+The simplified architecture makes the code easy to understand, modify, and maintain while providing all essential features for resolution management in modern ComfyUI workflows.

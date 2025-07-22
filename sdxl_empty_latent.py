@@ -18,7 +18,7 @@ class SdxlEmptyLatentImage:
         "max_resolution": int(os.environ.get("SDXL_MAX_RESOLUTION", "8192")),
         "min_resolution": int(os.environ.get("SDXL_MIN_RESOLUTION", "64")),
         "max_batch_size": int(os.environ.get("SDXL_MAX_BATCH_SIZE", "64")),
-        "channels": 4,
+        "default_channels": int(os.environ.get("SDXL_DEFAULT_CHANNELS", "4")),
         "scale_factor": 8,
         "fallback_resolution": 1024,
         "track_usage": os.environ.get("SDXL_TRACK_USAGE", "true").lower() == "true"
@@ -179,7 +179,8 @@ class SdxlEmptyLatentImage:
         return {
             "required": {
                 "resolution": (display_keys,),
-                "batch_size": ("INT", {"default": 1, "min": 1, "max": cls.CONFIG["max_batch_size"]})
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": cls.CONFIG["max_batch_size"]}),
+                "channels": (["4", "16"], {"default": str(cls.CONFIG["default_channels"])})
             }
         }
     
@@ -187,7 +188,7 @@ class SdxlEmptyLatentImage:
     FUNCTION = "generate"
     CATEGORY = "latent"
     
-    def generate(self, resolution: str, batch_size: int = 1) -> Tuple[Dict[str, torch.Tensor]]:
+    def generate(self, resolution: str, batch_size: int = 1, channels: str = "4") -> Tuple[Dict[str, torch.Tensor]]:
         """Generate empty latent tensor."""
         try:
             # Remove usage marks from resolution key
@@ -213,13 +214,21 @@ class SdxlEmptyLatentImage:
             width = resolutions[clean_resolution]["width"]
             height = resolutions[clean_resolution]["height"]
             
+            # Convert channels parameter to integer
+            try:
+                channels_int = int(channels)
+                if channels_int not in [4, 16]:
+                    raise ValueError(f"Unsupported channel count: {channels_int}")
+            except ValueError:
+                channels_int = self.CONFIG["default_channels"]
+            
             # Record usage
             self._record_usage(clean_resolution)
             
             # Generate latent tensor
             latent = torch.zeros([
                 batch_size,
-                self.CONFIG["channels"],
+                channels_int,
                 height // self.CONFIG["scale_factor"],
                 width // self.CONFIG["scale_factor"]
             ])
@@ -228,11 +237,18 @@ class SdxlEmptyLatentImage:
             
         except Exception as e:
             print(f"Error generating latent: {e}")
-            # Fallback to default resolution
+            # Fallback to default resolution with specified channels
             fallback_size = self.CONFIG["fallback_resolution"]
+            try:
+                channels_int = int(channels)
+                if channels_int not in [4, 16]:
+                    channels_int = self.CONFIG["default_channels"]
+            except ValueError:
+                channels_int = self.CONFIG["default_channels"]
+            
             fallback_latent = torch.zeros([
                 batch_size, 
-                self.CONFIG["channels"], 
+                channels_int, 
                 fallback_size // self.CONFIG["scale_factor"], 
                 fallback_size // self.CONFIG["scale_factor"]
             ])
