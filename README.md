@@ -3,40 +3,38 @@
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)
 [![日本語](https://img.shields.io/badge/lang-日本語-red.svg)](README.jp.md)
 
-An extension node for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that provides resolution selection with usage statistics and configuration management for generating empty latent images.<br>
+A simplified ComfyUI extension node that provides resolution selection with usage statistics for generating empty latent images.<br>
 <img src="misc/ss_resolution_list.jpg" alt="Node image" style="width:50%; height:auto;">
 
 ## Features
 
 ### Core Functionality
-- **Smart Resolution Selection**: Choose from pre-defined resolutions loaded from JSON files with dropdown selection
-- **Category-based Organization**: Automatic categorization (SDXL, SD15, Custom) with prefix display `[Category] Width x Height (aspect_ratio)`
-- **Aspect Ratio Display**: Decimal aspect ratios calculated as `width / height` with configurable precision
+- **Smart Resolution Selection**: Choose from pre-defined resolutions loaded from JSON files
+- **Category-based Organization**: Automatic categorization with priority order: Custom → SDXL → SD15
+- **Resolution Display**: Format `[Category] Width x Height (aspect_ratio)` with decimal aspect ratios
 
-### Usage Analytics & Visual Feedback
-- **Usage Statistics Tracking**: Automatic recording of resolution usage frequency and history
-- **Visual Status Indicators**: Dynamic marks displayed at the end of resolution labels:
-  - ★ **Favorite** resolutions (manually marked)
-  - 🔥 **Frequently used** resolutions (configurable threshold)
-  - 🕒 **Recently used** resolutions (configurable limit)
-- **Persistent Statistics**: Usage data saved to `usage_stats.json` with timestamps
+### Usage Statistics & Visual Feedback
+- **Usage Tracking**: Automatic recording of resolution usage frequency
+- **Visual Indicators**: Dynamic marks displayed after resolution labels:
+  - ★ **Favorite** resolutions (manually registered)
+  - 🔥 **Frequently used** resolutions (≥3 uses)
+  - 🕒 **Recently used** resolutions (last 5 used)
 
-### Advanced Configuration
-- **External Configuration**: Comprehensive settings via `config.json` with environment variable overrides
-- **Performance Optimization**: File caching system with modification time validation
-- **Error Handling**: Robust error handling with graceful degradation and fallback mechanisms
-- **Logging System**: Configurable logging levels and debug information
+### Simple Configuration
+- **Environment Variables**: Override settings with `SDXL_*` environment variables
+- **Basic JSON Config**: Simple `config.json` with essential settings only
 
-### Architecture Improvements
-- **Modular Design**: Clean separation of concerns with dedicated managers:
-  - `ResolutionManager`: Resolution loading and processing
-  - `UsageStatsManager`: Usage statistics and favorites management
-  - `CacheManager`: File caching and validation
-  - `ConfigurableLatentGenerator`: Latent tensor generation
-- **Interface-based**: Dependency injection patterns for better testability
-- **Type Safety**: Comprehensive type hints throughout the codebase
+## Resolution Display Order
+
+Resolutions are displayed in the following priority order:
+1. **Custom** resolutions (user-defined)
+2. **SDXL** resolutions 
+3. **SD15** resolutions
+
+Within each category, resolutions are sorted by aspect ratio (portrait → square → landscape).
 
 ## JSON Format
+
 Resolution files should follow this structure:
 ```json
 [
@@ -55,66 +53,89 @@ Resolution files should follow this structure:
 ## Pre-included Resolution Sets
 - **[sdxl_resolution_set.json](sdxl_resolution_set.json)**: Optimal SDXL training resolutions
 - **[sd_resolution_set.json](sd_resolution_set.json)**: Standard SD1.5 resolution set
+- **custom_resolution_set.json**: Your custom resolutions (create this file to add your own)
 
 ## Configuration
 
-### config.json Settings
-The extension supports extensive configuration via `config.json`. Copy `config.json.example` to `config.json` and customize as needed:
+### Environment Variables
+Override default settings:
+- `SDXL_MAX_RESOLUTION`: Maximum allowed resolution (default: 8192)
+- `SDXL_MIN_RESOLUTION`: Minimum allowed resolution (default: 64)
+- `SDXL_MAX_BATCH_SIZE`: Maximum batch size (default: 64)
+- `SDXL_TRACK_USAGE`: Enable/disable usage tracking (default: true)
 
+### config.json (Optional)
+Create or modify `config.json` for persistent settings:
 ```json
 {
-  "display_settings": {
-    "show_usage_marks": true,
-    "frequent_threshold": 2,
-    "recent_limit": 5,
-    "usage_marks": {
-      "favorite": "★",
-      "frequent": "🔥", 
-      "recent": "🕒"
-    }
-  },
-  "batch_settings": {
-    "default_batch_size": 1,
-    "max_batch_size": 64
-  },
-  "logging": {
-    "debug": false,
-    "log_level": "WARNING"
-  }
+  "max_resolution": 8192,
+  "min_resolution": 64,
+  "max_batch_size": 64,
+  "track_usage": true
 }
 ```
 
-### Environment Variables
-Override settings with environment variables:
-- `SDXL_DEBUG`: Enable debug logging
-- `SDXL_MAX_RESOLUTION`: Maximum allowed resolution
-- `SDXL_MAX_BATCH_SIZE`: Maximum batch size
-- `SDXL_ENABLE_CACHE`: Enable/disable caching
+## Managing Favorite Resolutions
 
-## Usage Statistics
+### Adding Favorites
+To mark resolutions as favorites, manually edit `usage_stats.json`:
 
+```json
+{
+  "favorites": [
+    "[CUSTOM] 1024 x 1024 (1.00)",
+    "[SDXL] 832 x 1216 (0.68)"
+  ],
+  "usage_count": {},
+  "recent": []
+}
+```
+
+### Usage Statistics
 The extension automatically tracks:
-- **Usage Count**: How many times each resolution is used
-- **Timestamps**: First and last usage times
+- **Usage Count**: Number of times each resolution is used
+- **Recent History**: Last 5 used resolutions
 - **Favorites**: Manually marked favorite resolutions
-- **Recent History**: Last 10 used resolutions
 
-### Debug Usage Information
-Run the debug utility to view detailed statistics:
-```bash
-python debug_usage.py
+Example `usage_stats.json` after usage:
+```json
+{
+  "favorites": [
+    "[CUSTOM] 1024 x 1024 (1.00)"
+  ],
+  "usage_count": {
+    "[SDXL] 1024 x 1024 (1.00)": 5,
+    "[SDXL] 832 x 1216 (0.68)": 2
+  },
+  "recent": [
+    "[SDXL] 832 x 1216 (0.68)",
+    "[SDXL] 1024 x 1024 (1.00)"
+  ]
+}
 ```
 
 ## Install
-1. Navigate to the `custom_nodes` folder where ComfyUI is installed.
-2. Use the `git clone` command to clone the repository:
+
+1. Navigate to the `custom_nodes` folder where ComfyUI is installed
+2. Clone the repository:
 ```bash
 git clone https://github.com/shingo1228/ComfyUI-SDXL-EmptyLatentImage
 ```
-3. (Optional) Copy and customize the configuration file:
+3. (Optional) Add custom resolutions by creating `custom_resolution_set.json`:
 ```bash
 cd ComfyUI-SDXL-EmptyLatentImage
-cp config.json.example config.json
-# Edit config.json to customize settings
+# Create your custom resolution file
+echo '[{"width": 1024, "height": 1024}, {"width": 512, "height": 768}]' > custom_resolution_set.json
 ```
-4. Restart ComfyUI to load the extension.
+4. (Optional) Customize settings in `config.json`
+5. Restart ComfyUI to load the extension
+
+## Architecture
+
+This extension uses a simplified single-class design:
+- **Single File**: All functionality in `sdxl_empty_latent.py`
+- **Simple Caching**: Basic file modification time checking
+- **Minimal Configuration**: Environment variables + optional JSON config
+- **Essential Features Only**: Focus on core resolution selection and usage tracking
+
+The simplified architecture makes the code easy to understand, modify, and maintain while providing all essential features for resolution management in ComfyUI workflows.
